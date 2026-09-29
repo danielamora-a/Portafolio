@@ -1,0 +1,255 @@
+<!DOCTYPE HTML>
+<!--
+	Stellar by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html lang="es">
+	<head>
+		<title>Caso 1: Power BI · Portafolio de Daniela Mora</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1>¿Vender más siempre significa ganar más?</h1>
+						<p>Caso 1 · Dashboard interactivo en Power BI</p>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul>
+							<li><a href="index.html#proyectos">&larr; Volver a proyectos</a></li>
+							<li><a href="#problema" class="active">Problema</a></li>
+							<li><a href="#obtencion">Obtención</a></li>
+							<li><a href="#limpieza">Limpieza</a></li>
+							<li><a href="#modelado">Modelado</a></li>
+							<li><a href="#visualizacion">Visualización</a></li>
+							<li><a href="#documentacion">Documentación</a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- 1. Problema -->
+							<section id="problema" class="main">
+								<header class="major">
+									<h2>1. Definición del problema</h2>
+								</header>
+								<h3>Contexto</h3>
+								<p>Este caso busca mostrar un análisis de diagnóstico y perfilamiento de datos junto con un tablero interactivo en Power BI mediante un relato visual. Los datos provienen de una empresa con distribución en Estados Unidos e incluyen información transaccional, como segmentos de clientes y categorías de productos.</p>
+								<h3>Pregunta de investigación</h3>
+								<p><strong>¿Vender más siempre implica ganar más?</strong> Esta duda surgió al revisar la información proporcionada.</p>
+								<h3>Sub-preguntas</h3>
+								<ul>
+									<li>¿Qué categorías generan más ventas frente a lo que realmente se obtiene en ganancias?</li>
+									<li>¿Qué ubicaciones generan más ventas frente a lo que realmente se obtiene en ganancias?</li>
+									<li>¿Qué modos de envío generan más ventas frente a lo que realmente se obtiene en ganancias?</li>
+								</ul>
+							</section>
+
+						<!-- 2. Obtención -->
+							<section id="obtencion" class="main">
+								<header class="major">
+									<h2>2. Obtención de datos</h2>
+								</header>
+								<p>Debido a limitaciones externas del equipo usado para el análisis, no fue posible extraer los datos directamente del “Folder”, que contenía dos archivos Excel con la información necesaria. En su lugar, se combinó el archivo CSV de dataset1 con el Excel de dataset2 mediante la herramienta “merge” de Power BI. Así se evitó cualquier error y los datos quedaron en buen estado.</p>
+								<div class="table-wrapper">
+									<table>
+										<thead>
+											<tr>
+												<th>Fuente</th>
+												<th>Tipo</th>
+												<th>Uso</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>Dataset1</td>
+												<td>CSV</td>
+												<td>Transacciones de venta</td>
+											</tr>
+											<tr>
+												<td>Dataset2</td>
+												<td>Excel</td>
+												<td>Transacciones de venta</td>
+											</tr>
+											<tr>
+												<td><strong>Merge1</strong></td>
+												<td>Consulta combinada en Power BI</td>
+												<td>Tabla final del análisis: 8001 registros</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<p>La información analizada incluye 8001 registros de transacciones de venta con variables como fecha de orden y envío, modo de envío, segmento de cliente, ubicación geográfica, categorías y subcategorías de producto, ventas, cantidad, descuento y ganancia.</p>
+							</section>
+
+						<!-- 3. Limpieza -->
+							<section id="limpieza" class="main">
+								<header class="major">
+									<h2>3. Limpieza y transformación (ETL)</h2>
+								</header>
+								<p>Durante el perfilamiento se identificaron y corrigieron lo siguiente:</p>
+								<div class="table-wrapper">
+									<table>
+										<thead>
+											<tr>
+												<th>Diagnóstico</th>
+												<th>Decisión</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><strong>Datos faltantes</strong></td>
+												<td>No se detectaron datos faltantes en la sección de transformación. Las pruebas de verificación correspondientes no revelaron valores vacíos ni ausentes.</td>
+											</tr>
+											<tr>
+												<td><strong>Formatos inconsistentes</strong></td>
+												<td>Se identificaron datos con fechas en formatos mixtos y códigos postales que perdían el cero inicial al interpretarse como números. Ambas inconsistencias se resolvieron al definir la configuración regional adecuada (inglés de Estados Unidos) durante la conversión.</td>
+											</tr>
+											<tr>
+												<td><strong>Columnas irrelevantes</strong></td>
+												<td>La columna Country contenía un solo valor repetido en las 8001 filas (United States), por lo que se eliminó. También se retiraron Row ID, Product ID, Customer Name y Postal Code.</td>
+											</tr>
+											<tr>
+												<td><strong>Duplicados</strong></td>
+												<td>No se encontraron filas duplicadas por medio de los análisis necesarios.</td>
+											</tr>
+											<tr>
+												<td><strong>Valores atípicos</strong></td>
+												<td>Se detectaron ciertos valores en Profit y Sales fuera del rango habitual. Se decidió conservarlos, pues reflejan una variabilidad del negocio que ocurre en la vida real, provocada por descuentos o grandes órdenes de compra.</td>
+											</tr>
+											<tr>
+												<td><strong>Estandarización</strong></td>
+												<td>Se ajustó la columna Ship Mode para estandarizar las categorías, quitando la palabra Class para conservar solo el nombre del tipo de envío.</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</section>
+
+						<!-- 4. Modelado -->
+							<section id="modelado" class="main">
+								<header class="major">
+									<h2>4. Modelado de datos</h2>
+								</header>
+								<ul>
+									<li>Tabla única <strong>Merge1</strong>, resultado de combinar Dataset1 y Dataset2.</li>
+									<li>Jerarquía de fechas automática de Power BI sobre <strong>Order Date</strong> (año, trimestre, mes) para el análisis en el tiempo.</li>
+									<li>Tres medidas DAX para los indicadores del tablero:</li>
+								</ul>
+<pre><code>Ventas total = SUM(Merge1[Sales])
+
+Ganancia total = SUM(Merge1[Profit])
+
+Margen de Ganancia = DIVIDE([Ganancia total], [Ventas total])</code></pre>
+							</section>
+
+						<!-- 5. Visualización -->
+							<section id="visualizacion" class="main">
+								<header class="major">
+									<h2>5. Visualización de datos</h2>
+								</header>
+								<a href="images/caso1-dashboard.png" target="_blank" class="image main"><img src="images/caso1-dashboard.png" alt="Dashboard en Power BI: tarjetas de ventas, ganancia y margen, gráfico de líneas, mapa de ventas por estado, dispersión de subcategorías y dona de modos de envío" /></a>
+								<p><em>Dashboard diseñado para el storytelling. Elaboración propia con base en los datos suministrados. Haz clic en la imagen para verla en tamaño completo.</em></p>
+								<h3>Storytelling</h3>
+								<p>El dashboard fue diseñado siguiendo una narración de tres partes:</p>
+								<ol>
+									<li><strong>Panorama general:</strong> las cuatro tarjetas (ventas totales, ganancia total, margen de ganancia y total de órdenes) ofrecen una visualización del desempeño general, esto se acompaña de un gráfico de líneas que compara la evolución mensual de ventas y ganancia.</li>
+									<li><strong>Hallazgo central:</strong> el gráfico de dispersión (Sales vs. Profit por subcategoría) permite identificar visualmente qué subcategorías, a pesar de vender mucho, no son rentables.</li>
+									<li><strong>Contexto geográfico y de operación:</strong> un mapa de burbujas muestra la distribución por estado y un gráfico de dona presenta la participación de cada modo de envío en la ganancia total.</li>
+								</ol>
+								<p>Además, se incluyeron segmentadores o listas interactivas de categoría, región y fecha de orden, que permiten explorar el comportamiento de los datos.</p>
+
+								<h3>Principales hallazgos</h3>
+								<ul class="statistics">
+									<li class="style1">
+										<span class="icon solid fa-dollar-sign"></span>
+										<strong>1.81 M</strong> Ventas totales
+									</li>
+									<li class="style2">
+										<span class="icon solid fa-chart-line"></span>
+										<strong>236.87 K</strong> Ganancia total
+									</li>
+									<li class="style3">
+										<span class="icon solid fa-percent"></span>
+										<strong>13.07 %</strong> Margen de ganancia
+									</li>
+									<li class="style4">
+										<span class="icon solid fa-receipt"></span>
+										<strong>8001</strong> Órdenes
+									</li>
+									<li class="style5">
+										<span class="icon solid fa-truck"></span>
+										<strong>57 %</strong> Ganancia vía Standard
+									</li>
+								</ul>
+								<ul>
+									<li>A lo largo de los años, las ventas mensuales oscilan entre 0.05 y 0.3 millones, mientras que las ganancias permanecen bajas de forma constante. Esto podría indicar que el aumento en ventas no implica mayor rentabilidad.</li>
+									<li>Al revisar las subcategorías de producto, se nota que la mayoría es rentable, sin embargo, algunas como Tables, Bookcases y Supplies generan ventas importantes pero pérdidas, lo que indica posibles problemas con descuentos o costos no cubiertos por el precio de venta.</li>
+									<li>La distribución geográfica de las ventas muestra que estas se reparten entre las cuatro regiones del país, sin una concentración significativa en algún estado.</li>
+									<li>El envío Standard es el más utilizado y el que aporta la mayor ganancia total (aprox. 57 %), lo que sugiere que no se requieren opciones más costosas para elevar la rentabilidad.</li>
+								</ul>
+							</section>
+
+						<!-- 6. Documentación -->
+							<section id="documentacion" class="main">
+								<header class="major">
+									<h2>6. Documentación</h2>
+								</header>
+								<h3>Recomendaciones finales</h3>
+								<p>Las estrategias comerciales deberían centrarse en las subcategorías y regiones con ventas elevadas y alta rentabilidad, en lugar de priorizar el volumen total. Dado que el envío estándar es el modo más rentable y utilizado, cabe evaluar si es posible optimizar más esa logística en vez de fomentar opciones más costosas. Es necesario revisar los descuentos en las subcategorías que generan pérdidas pese a su buen número de ventas, pues el margen negativo indica que los descuentos superan la contribución marginal del producto.</p>
+								<h3>Archivos del proyecto</h3>
+								<ul class="actions" style="flex-wrap: wrap;">
+									<li><a href="proyectos/caso1/Caso1_DanielaMora.pdf" class="button primary icon solid fa-file-pdf" target="_blank">Informe (PDF)</a></li>
+									<li><a href="proyectos/caso1/Caso1_DanielaMora.pbix" class="button icon solid fa-download" download>Archivo Power BI (.pbix)</a></li>
+									<li><a href="https://github.com/danielamora-a/Portafolio" class="button icon brands fa-github" target="_blank" rel="noopener noreferrer">Repositorio</a></li>
+								</ul>
+							</section>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<section>
+							<h2>Portafolio de Daniela Mora</h2>
+							<p>Proyectos de gestión y visualización de datos aplicados a los agronegocios y la bioeconomía.</p>
+							<ul class="actions">
+								<li><a href="index.html" class="button">Volver al inicio</a></li>
+							</ul>
+						</section>
+						<section>
+							<h2>Contacto</h2>
+							<dl class="alt">
+								<dt>Email</dt>
+								<dd><a href="mailto:daniela.ma2020@gmail.com">daniela.ma2020@gmail.com</a></dd>
+							</dl>
+							<ul class="icons">
+								<li><a href="https://github.com/danielamora-a/Portafolio" class="icon brands fa-github alt" target="_blank" rel="noopener noreferrer"><span class="label">GitHub</span></a></li>
+							</ul>
+						</section>
+						<p class="copyright">&copy; Daniela Mora 2026. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
