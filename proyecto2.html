@@ -1,0 +1,282 @@
+<!DOCTYPE HTML>
+<!--
+	Stellar by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html lang="es">
+	<head>
+		<title>Caso 2: Modelo de Constelación · Portafolio de Daniela Mora</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1>¿Dónde hay un desajuste entre inventario y ventas?</h1>
+						<p>Caso 2 · Modelo de constelación con SQL Server y Power BI</p>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul>
+							<li><a href="index.html#proyectos">&larr; Volver a proyectos</a></li>
+							<li><a href="#problema" class="active">Problema</a></li>
+							<li><a href="#obtencion">Obtención</a></li>
+							<li><a href="#limpieza">Diagnóstico</a></li>
+							<li><a href="#modelado">Modelado</a></li>
+							<li><a href="#visualizacion">Visualización</a></li>
+							<li><a href="#documentacion">Documentación</a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- 1. Problema -->
+							<section id="problema" class="main">
+								<header class="major">
+									<h2>1. Definición del problema</h2>
+								</header>
+								<h3>Contexto</h3>
+								<p>Este caso propone aplicar el modelo de constelación de hechos a una base de datos real para construir un dashboard en Power BI mediante un relato visual. Se empleó ContosoRetailDW, una base de datos de ejemplo en SQL Server. Estos datos simulan el almacén de una cadena de tiendas, con detalles sobre ventas en tienda, ventas en línea e inventario, entre otros.</p>
+								<h3>Pregunta de investigación</h3>
+								<p><strong>¿Dónde existe una discrepancia entre el inventario disponible y las ventas reales?</strong></p>
+								<p>Para responderla, se combinaron inventario y ventas mediante elementos compartidos como el producto, la tienda y la fecha, lo que genera una constelación. El análisis se enfoca en 2009, aunque el tablero permite revisar los dos años previos.</p>
+							</section>
+
+						<!-- 2. Obtención -->
+							<section id="obtencion" class="main">
+								<header class="major">
+									<h2>2. Obtención de datos</h2>
+								</header>
+								<p>Los datos provienen de <strong>ContosoRetailDW</strong>, una base de datos de ejemplo en SQL Server. Al revisarla en SQL, se identificaron 25 tablas: 8 tablas de hechos y 17 de dimensiones.</p>
+								<div class="table-wrapper">
+									<table>
+										<thead>
+											<tr>
+												<th>Tabla de hechos</th>
+												<th>Filas</th>
+												<th>¿Seleccionada?</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><strong>FactOnlineSales</strong></td>
+												<td>12.6 millones</td>
+												<td>Sí: ventas en línea</td>
+											</tr>
+											<tr>
+												<td><strong>FactInventory</strong></td>
+												<td>8 millones</td>
+												<td>Sí: inventario</td>
+											</tr>
+											<tr>
+												<td>FactSalesQuota</td>
+												<td>7.5 millones</td>
+												<td>No</td>
+											</tr>
+											<tr>
+												<td><strong>FactSales</strong></td>
+												<td>3.4 millones</td>
+												<td>Sí: ventas en tienda</td>
+											</tr>
+											<tr>
+												<td>FactStrategyPlan</td>
+												<td>2.8 millones</td>
+												<td>No</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<p>Se seleccionaron FactSales, FactOnlineSales y FactInventory porque describen la misma operación comercial y comparten las dimensiones de fecha, producto, tienda y moneda. Además, permiten cruzar inventario con ventas, que es justamente lo que se pretende demostrar con el dashboard. Las tablas de tecnología y tipos de cambio no comparten estas dimensiones, mientras que FactSalesQuota y FactStrategyPlan se dejaron fuera porque no se tomaron en cuenta para este análisis.</p>
+
+								<h3>Consultas SQL utilizadas en la exploración</h3>
+								<h4>Tablas y número de filas</h4>
+<pre><code>SELECT t.name AS tabla, SUM(p.rows) AS filas
+FROM sys.tables t
+JOIN sys.partitions p ON p.object_id = t.object_id AND p.index_id IN (0,1)
+GROUP BY t.name
+ORDER BY t.name;</code></pre>
+								<h4>Llaves foráneas de las tablas de hechos</h4>
+<pre><code>SELECT OBJECT_NAME(fk.parent_object_id) AS tabla_hecho,
+       COL_NAME(fkc.parent_object_id, fkc.parent_column_id) AS columna,
+       OBJECT_NAME(fk.referenced_object_id) AS dimension
+FROM sys.foreign_keys fk
+JOIN sys.foreign_key_columns fkc ON fk.object_id = fkc.constraint_object_id
+WHERE OBJECT_NAME(fk.parent_object_id) LIKE 'Fact%'
+ORDER BY tabla_hecho;</code></pre>
+								<h4>Rango de fechas por tabla de hechos</h4>
+<pre><code>SELECT 'FactSales' AS tabla, MIN(DateKey) AS desde, MAX(DateKey) AS hasta FROM FactSales
+UNION ALL
+SELECT 'FactOnlineSales', MIN(DateKey), MAX(DateKey) FROM FactOnlineSales
+UNION ALL
+SELECT 'FactInventory', MIN(DateKey), MAX(DateKey) FROM FactInventory;</code></pre>
+								<h4>Relaciones entre dimensiones</h4>
+<pre><code>SELECT OBJECT_NAME(fk.parent_object_id) AS tabla,
+       COL_NAME(fkc.parent_object_id, fkc.parent_column_id) AS columna,
+       OBJECT_NAME(fk.referenced_object_id) AS referencia
+FROM sys.foreign_keys fk
+JOIN sys.foreign_key_columns fkc ON fk.object_id = fkc.constraint_object_id
+WHERE OBJECT_NAME(fk.parent_object_id) LIKE 'Dim%'
+ORDER BY tabla;</code></pre>
+							</section>
+
+						<!-- 3. Diagnóstico -->
+							<section id="limpieza" class="main">
+								<header class="major">
+									<h2>3. Diagnóstico y preparación de los datos</h2>
+								</header>
+								<p>Durante la exploración se encontraron estos detalles:</p>
+								<div class="table-wrapper">
+									<table>
+										<thead>
+											<tr>
+												<th>Hallazgo</th>
+												<th>Detalle y decisión</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><strong>Años sin datos</strong></td>
+												<td>La tabla de fechas incluye años de 2005 a 2011, pero los hechos solo tienen datos entre 2007 y 2009, por lo que se aplicó un filtro en el informe para mostrar únicamente esos años.</td>
+											</tr>
+											<tr>
+												<td><strong>Volumen</strong></td>
+												<td>Las tres tablas seleccionadas suman cerca de 24 millones de filas.</td>
+											</tr>
+											<tr>
+												<td><strong>Periodo</strong></td>
+												<td>Las ventas abarcan desde el 1 de enero de 2007 hasta el 31 de diciembre de 2009, mientras que el inventario se registra desde el 6 de enero de 2007 hasta el 26 de diciembre de 2009, debido a que se llevan registros periódicos de las existencias.</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</section>
+
+						<!-- 4. Modelado -->
+							<section id="modelado" class="main">
+								<header class="major">
+									<h2>4. Modelado de datos</h2>
+								</header>
+								<p>Se aplicó un <strong>modelo de constelación de hechos</strong>: varios esquemas en forma de estrella conectados por las dimensiones que tienen en común. En el centro se encuentran las tres tablas de hechos (FactSales, FactOnlineSales y FactInventory), que comparten las dimensiones de fecha, producto, tienda y moneda. El modelo presenta 19 relaciones activas, todas de uno a muchos con filtro en una sola dirección, desde la dimensión hacia el hecho.</p>
+								<a href="images/caso2-modelo-drawio.png" target="_blank" class="image main"><img src="images/caso2-modelo-drawio.png" alt="Diagrama del modelo de constelación en draw.io con FactSales, FactOnlineSales y FactInventory al centro y sus dimensiones alrededor" /></a>
+								<p><em>Modelo de constelación de ContosoRetailDW. Elaboración propia en draw.io.</em></p>
+								<a href="images/caso2-modelo-powerbi.png" target="_blank" class="image main"><img src="images/caso2-modelo-powerbi.png" alt="Vista de modelo en Power BI con las tres tablas de hechos y sus relaciones con las dimensiones" /></a>
+								<p><em>Modelo de constelación de ContosoRetailDW. Elaboración propia en Power BI.</em></p>
+								<h3>Medidas DAX principales</h3>
+								<ul>
+									<li><strong>Unidades Vendidas:</strong> combinan las cantidades de ventas en tienda y en línea.</li>
+									<li><strong>Inventario Actual</strong> y <strong>Stock de Seguridad:</strong> toman la última captura del periodo, sin sumar todas las capturas.</li>
+									<li><strong>Cobertura en Días:</strong> indica cuántos días de venta cubre el inventario.</li>
+									<li><strong>Brecha vs Seguridad:</strong> muestra cuántas unidades superan o no el mínimo.</li>
+								</ul>
+							</section>
+
+						<!-- 5. Visualización -->
+							<section id="visualizacion" class="main">
+								<header class="major">
+									<h2>5. Visualización de datos</h2>
+								</header>
+								<p>El dashboard se diseñó en 3 páginas que responden a la misma pregunta: ¿dónde hay un desajuste entre lo que hay en inventario y lo que se vende? Cada página tiene un título que resume su hallazgo.</p>
+
+								<ul class="statistics">
+									<li class="style1">
+										<span class="icon solid fa-boxes"></span>
+										<strong>835 K</strong> Unidades en inventario
+									</li>
+									<li class="style2">
+										<span class="icon solid fa-shopping-cart"></span>
+										<strong>25 M</strong> Unidades vendidas
+									</li>
+									<li class="style3">
+										<span class="icon solid fa-calendar-alt"></span>
+										<strong>12.3</strong> Días de cobertura
+									</li>
+									<li class="style4">
+										<span class="icon solid fa-dollar-sign"></span>
+										<strong>78.5 M</strong> Valor del inventario
+									</li>
+									<li class="style5">
+										<span class="icon solid fa-exclamation-triangle"></span>
+										<strong>3</strong> Subcategorías bajo el mínimo
+									</li>
+								</ul>
+
+								<h3>Página 1 · Panorama del inventario</h3>
+								<a href="images/caso2-pagina1.png" target="_blank" class="image main"><img src="images/caso2-pagina1.png" alt="Página 1 del dashboard: tarjetas de inventario, ventas, cobertura y valor; gráfico de ventas e inventario por mes; cobertura en días por categoría" /></a>
+								<p>En 2009, la empresa contaba con 835 mil unidades en inventario, valoradas en 78.5 millones, mientras que vendió 25 millones de unidades durante el año. Esto resultó en una cobertura de inventario de 12.3 días, lo que significa que el inventario era suficiente para poco menos de dos semanas con el ritmo de venta anual. A lo largo del año, las ventas mensuales aumentaron de 1.69 millones de unidades en marzo a 2.38 millones en diciembre, y el inventario siguió una tendencia similar, oscilando entre 0.64 y 0.93 millones de unidades. Sin embargo, al analizar por categoría, la mayoría tenía una cobertura de entre 13 y 14 días, pero las categorías de Cell phones (aproximadamente 11 días) y Games and Toys (aproximadamente 8 días) quedaron por debajo del umbral de 12 días y se destacan en naranja.</p>
+
+								<h3>Página 2 · El desajuste</h3>
+								<a href="images/caso2-pagina2.png" target="_blank" class="image main"><img src="images/caso2-pagina2.png" alt="Página 2 del dashboard: dispersión de ventas contra inventario por subcategoría, subcategorías bajo el stock de seguridad y top 10 con más exceso" /></a>
+								<p>El inventario total (834,948 unidades) es casi el doble del stock de seguridad (428,902 unidades), con una diferencia de 406,046 unidades. En general, hay inventario suficiente. No obstante, tres subcategorías están por debajo de su nivel mínimo: Movie DVD (−39,372 unidades), Boxed Games (−2,374) y Smart phones &amp; PDAs (−204, casi en el límite).</p>
+								<p>El gráfico de dispersión usa una escala logarítmica debido a la gran variación en las cantidades de las subcategorías. Los puntos muestran una relación casi lineal, lo que indica que el inventario se distribuye proporcionalmente a las ventas. Las subcategorías con mayor exceso de inventario son Cell phones Accessories (82 mil), Computers Accessories (44 mil), Lamps (33 mil) y Laptops (29 mil). Un punto solitario bajo los demás representa una subcategoría con altas ventas y poco inventario: Download Games.</p>
+
+								<h3>Página 3 · Detalle por subcategoría</h3>
+								<a href="images/caso2-pagina3.png" target="_blank" class="image main"><img src="images/caso2-pagina3.png" alt="Página 3 del dashboard: matriz por subcategoría con formato condicional y ranking de menor cobertura en días" /></a>
+								<p>La matriz organiza las subcategorías según su diferencia con el stock de seguridad, destacando en color los casos más urgentes. El hallazgo más significativo es Download Games, con apenas 4.6 días de cobertura, muy por debajo del resto, que oscila entre 10 y 17 días. Su inventario (19 mil unidades) supera el mínimo por solo 628 unidades, pero su rotación es muy rápida.</p>
+								<p>Movie DVD presenta una situación particular: su inventario está 39 mil unidades por debajo de su stock de seguridad (18 mil unidades disponibles contra 57 mil de seguridad), pero su cobertura es normal (13.2 días). Esto indica que el problema no radica en una demanda excesiva, sino en un stock de seguridad demasiado alto en relación con las ventas reales. En contraste, Cell phones Accessories tiene el mayor exceso de unidades, pero una cobertura baja (10.8 días), ya que sus ventas son tan altas que incluso un inventario considerable se agota rápidamente. Esto demuestra que un exceso de unidades no siempre se traduce en un exceso de días de venta.</p>
+
+								<h3>Decisiones de diseño</h3>
+								<p>Cada gráfico se seleccionó de acuerdo con la pregunta: columnas y línea para mostrar la evolución mensual, barras horizontales para comparar categorías, dispersión para relacionar dos medidas y matriz para dar detalle. Se optó por una paleta de colores reservando el naranja para las alertas, de manera que el color llame la atención sobre los casos críticos. El umbral de 12 días se eligió como referencia cercana a la cobertura promedio de 2009 (12.3 días).</p>
+
+								<h3>Supuestos y limitaciones</h3>
+								<p>Se consideró que las ventas en tienda y en línea provienen del mismo inventario, por lo que las unidades vendidas combinan ambos canales. Los días con actividad se determinaron con base en las ventas en tienda, mientras que el inventario se registró como la última captura del periodo. Asimismo, el estudio se enfocó en 2009 y no examinó el comportamiento por tienda ni por canal, aunque el modelo lo permite.</p>
+							</section>
+
+						<!-- 6. Documentación -->
+							<section id="documentacion" class="main">
+								<header class="major">
+									<h2>6. Documentación</h2>
+								</header>
+								<h3>Archivos del proyecto</h3>
+								<p>El informe, el archivo de Power BI y las consultas SQL están en el repositorio del proyecto.</p>
+								<ul class="actions" style="flex-wrap: wrap;">
+									<li><a href="https://github.com/danielamora-a/Caso2_DM" class="button primary icon brands fa-github" target="_blank" rel="noopener noreferrer">Ver repositorio del Caso 2</a></li>
+									<li><a href="https://github.com/danielamora-a/Caso2_DM/blob/main/Caso2_DanielaMora.pdf" class="button icon solid fa-file-pdf" target="_blank" rel="noopener noreferrer">Informe (PDF)</a></li>
+								</ul>
+							</section>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<section>
+							<h2>Portafolio de Daniela Mora</h2>
+							<p>Proyectos de gestión y visualización de datos aplicados a los agronegocios y la bioeconomía.</p>
+							<ul class="actions">
+								<li><a href="index.html" class="button">Volver al inicio</a></li>
+							</ul>
+						</section>
+						<section>
+							<h2>Contacto</h2>
+							<dl class="alt">
+								<dt>Email</dt>
+								<dd><a href="mailto:daniela.ma2020@gmail.com">daniela.ma2020@gmail.com</a></dd>
+							</dl>
+							<ul class="icons">
+								<li><a href="https://github.com/danielamora-a/Portafolio" class="icon brands fa-github alt" target="_blank" rel="noopener noreferrer"><span class="label">GitHub</span></a></li>
+							</ul>
+						</section>
+						<p class="copyright">&copy; Daniela Mora 2026. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
