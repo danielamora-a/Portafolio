@@ -6,7 +6,7 @@
 -->
 <html lang="es">
 	<head>
-		<title>Proyecto 3 · Portafolio de Daniela Mora</title>
+		<title>Caso 3: Python en Power BI · Portafolio de Daniela Mora</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -19,8 +19,8 @@
 
 				<!-- Header -->
 					<header id="header">
-						<h1>[Título del proyecto 3]</h1>
-						<p>Proyecto 3 · Gestión y Visualización de Datos</p>
+						<h1>Las ventas crecen 20 %, pero el margen cede</h1>
+						<p>Caso 3 · Visualizaciones avanzadas con Python en Power BI</p>
 					</header>
 
 				<!-- Nav -->
@@ -39,28 +39,19 @@
 				<!-- Main -->
 					<div id="main">
 
-						<!--
-							Para agregar una captura de pantalla en cualquier sección:
-							1. Guarda la imagen en la carpeta images/ con un nombre sin espacios (ej: p3-modelo.png)
-							2. Pega esta línea donde quieras que aparezca:
-							<span class="image main"><img src="images/p3-modelo.png" alt="Descripción de la imagen" /></span>
-						-->
-
 						<!-- 1. Problema -->
 							<section id="problema" class="main">
 								<header class="major">
 									<h2>1. Definición del problema</h2>
 								</header>
 								<h3>Contexto</h3>
-								<p>[Describe el contexto: empresa, sector o situación de agronegocios / bioeconomía]</p>
-								<h3>Problema</h3>
-								<p>[¿Qué necesidad o problema se quiere resolver con los datos?]</p>
-								<h3>Preguntas a analizar</h3>
-								<ul>
-									<li>[Pregunta 1]</li>
-									<li>[Pregunta 2]</li>
-									<li>[Pregunta 3]</li>
-								</ul>
+								<p>Este caso pretende integrar visualizaciones avanzadas generadas con Python en Power BI y desarrollar un tablero interactivo mediante un relato visual. Los datos provienen del Superstore Dataset, que agrupa las líneas de pedido de una empresa de distribución en Estados Unidos entre enero de 2019 y diciembre de 2020, con detalles sobre clientes, productos, envíos, ventas y ganancia.</p>
+								<h3>Preguntas de investigación</h3>
+								<ol>
+									<li>¿Qué variables presentan mayor correlación con el beneficio total?</li>
+									<li>¿Existen diferencias significativas en la satisfacción del cliente según la región o categoría?</li>
+									<li>¿Cómo se comportan las ventas a lo largo del tiempo y qué tendencia se observa para los próximos meses?</li>
+								</ol>
 							</section>
 
 						<!-- 2. Obtención -->
@@ -68,25 +59,7 @@
 								<header class="major">
 									<h2>2. Obtención de datos</h2>
 								</header>
-								<p>[¿De dónde vienen los datos? Excel, SQL, base de datos pública… Incluye el enlace a la fuente si es pública]</p>
-								<div class="table-wrapper">
-									<table>
-										<thead>
-											<tr>
-												<th>Fuente</th>
-												<th>Tipo</th>
-												<th>Descripción</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td>[Nombre]</td>
-												<td>[Excel / CSV / SQL…]</td>
-												<td>[Qué contiene]</td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
+								<p>Se importó el archivo Superstore Dataset (Excel), que tiene dos hojas: <strong>Orders</strong> y <strong>Returns</strong>. La hoja Orders contiene 5,899 líneas de pedido con variables como fecha de orden y de envío, modo de envío, segmento, región, categoría y subcategoría de producto, ventas, cantidad y ganancia.</p>
 							</section>
 
 						<!-- 3. Limpieza -->
@@ -94,14 +67,44 @@
 								<header class="major">
 									<h2>3. Limpieza y transformación (ETL)</h2>
 								</header>
-								<h3>Diagnóstico</h3>
-								<p>[¿Qué anomalías o problemas encontraste en los datos? Valores nulos, duplicados, tipos incorrectos…]</p>
-								<h3>Transformaciones aplicadas</h3>
-								<ol>
-									<li>[Paso 1]</li>
-									<li>[Paso 2]</li>
-									<li>[Paso 3]</li>
-								</ol>
+								<p>Durante el perfilamiento en Power Query se identificó y corrigió lo siguiente:</p>
+								<div class="table-wrapper">
+									<table>
+										<thead>
+											<tr>
+												<th>Diagnóstico</th>
+												<th>Decisión</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><strong>Encabezado dañado</strong></td>
+												<td>El nombre de la primera columna venía como texto corrupto (“Row ID+O6G3A1:R6”), por lo que se renombró a Row ID. Se conservó porque los visuales de Python la necesitan.</td>
+											</tr>
+											<tr>
+												<td><strong>Fechas de envío con año erróneo</strong></td>
+												<td>42 líneas de pedido de diciembre de 2020 tenían Ship Date en enero de 2019, anterior a la fecha de la orden. Con una columna personalizada se sumaron dos años a esas fechas; después de la corrección, los días de entrega quedaron entre 0 y 8, lo cual respeta el rango de cada modo de envío.</td>
+											</tr>
+											<tr>
+												<td><strong>Datos faltantes</strong></td>
+												<td>Se buscaron valores vacíos y marcadores como “-”, “--” o “N/A”, porque en el Caso 1 un guion no se detectaba como nulo. No se encontró nada en la hoja Orders.</td>
+											</tr>
+											<tr>
+												<td><strong>Duplicados</strong></td>
+												<td>No hay filas repetidas al comparar todas las columnas excepto Row ID, que es único en cada fila. Se aplicó Quitar duplicados con esa condición y no eliminó ninguna fila.</td>
+											</tr>
+											<tr>
+												<td><strong>Columnas irrelevantes</strong></td>
+												<td>Country contiene un solo valor (United States), por lo que se eliminó, junto con Customer Name y Product ID, que no se usan en el análisis.</td>
+											</tr>
+											<tr>
+												<td><strong>Valores atípicos</strong></td>
+												<td>La ganancia va de −$6,600 a +$8,400. Se conservaron porque reflejan grandes pedidos del negocio.</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<p>Se establecieron los tipos de dato (enteros para Row ID y Quantity, decimales para Sales y Profit, fecha para Order Date y Ship Date, y texto para el resto), con Recortar y Limpiar aplicados a las columnas de texto.</p>
 							</section>
 
 						<!-- 4. Modelado -->
@@ -109,11 +112,23 @@
 								<header class="major">
 									<h2>4. Modelado de datos</h2>
 								</header>
-								<p>[Describe tu modelo: tablas de hechos y dimensiones, relaciones, cardinalidad, dirección del filtro]</p>
-								<h3>Medidas principales</h3>
-								<p>[Explica las medidas DAX o columnas calculadas más importantes]</p>
-<pre><code>[Nombre de la medida] =
-[Pega aquí tu fórmula DAX]</code></pre>
+								<p>El análisis usa la tabla <strong>Orders</strong>. Las devoluciones (Returns) no se pueden vincular con los pedidos, por lo que no se usaron.</p>
+								<h3>Columnas calculadas</h3>
+								<ul>
+									<li><strong>Delivery Days:</strong> Ship Date menos Order Date, en días.</li>
+									<li><strong>Unit Price:</strong> Sales dividido entre Quantity.</li>
+									<li><strong>Order Year:</strong> año de Order Date.</li>
+								</ul>
+								<h3>Medidas DAX</h3>
+								<p>Sales Total, Profit Total, Margen de Ganancia, Crecimiento de Ventas, Líneas con Pérdida %, Pedidos y Clientes. Las dos últimas emplean DISTINCTCOUNT, dado que un pedido abarca varias líneas. Por ejemplo:</p>
+<pre><code>Crecimiento de Ventas =
+DIVIDE (
+    CALCULATE ( [Sales Total], Orders[Order Year] = 2020 )
+        - CALCULATE ( [Sales Total], Orders[Order Year] = 2019 ),
+    CALCULATE ( [Sales Total], Orders[Order Year] = 2019 )
+)</code></pre>
+								<h3>Supuesto sobre la satisfacción del cliente</h3>
+								<p>El conjunto de datos no incluye encuestas ni calificaciones. Por lo tanto, se usó el tiempo de entrega (Delivery Days) como indicador: a menos días entre el pedido y el envío, mayor satisfacción se espera. Los resultados de la pregunta 2 deben verse como cambios en el servicio de entrega, no como una medición directa de la satisfacción.</p>
 							</section>
 
 						<!-- 5. Visualización -->
@@ -121,9 +136,63 @@
 								<header class="major">
 									<h2>5. Visualización de datos</h2>
 								</header>
-								<p>[Describe tu reporte o dashboard: qué visuales elegiste y por qué]</p>
-								<h3>Hallazgos</h3>
-								<p>[¿Qué respuestas encontraste a las preguntas del inicio?]</p>
+
+								<ul class="statistics">
+									<li class="style1">
+										<span class="icon solid fa-dollar-sign"></span>
+										<strong>$1.34 M</strong> Ventas
+									</li>
+									<li class="style2">
+										<span class="icon solid fa-chart-line"></span>
+										<strong>$175.2 K</strong> Ganancia
+									</li>
+									<li class="style3">
+										<span class="icon solid fa-percent"></span>
+										<strong>13.05 %</strong> Margen
+									</li>
+									<li class="style4">
+										<span class="icon solid fa-receipt"></span>
+										<strong>3,002</strong> Pedidos
+									</li>
+									<li class="style5">
+										<span class="icon solid fa-users"></span>
+										<strong>773</strong> Clientes
+									</li>
+								</ul>
+
+								<h3>Visualizaciones avanzadas con Python</h3>
+								<p>Para integrar Python se definió en las opciones de Power BI con las librerías <strong>pandas, numpy, matplotlib, seaborn y scipy</strong>. En cada visual se arrastran únicamente los campos necesarios de la tabla Orders, con los numéricos en No resumir y Order Date como fecha simple, sin jerarquía.</p>
+
+								<h4>Visual 1 · Correlación con el beneficio (pregunta 1)</h4>
+								<a href="images/caso3-v1-correlacion.png" target="_blank" class="image main"><img src="images/caso3-v1-correlacion.png" alt="Mapa de calor triangular de correlaciones de Spearman y ranking de asociación de cada variable con el beneficio" /></a>
+								<p>Mapa de calor triangular con seaborn y matplotlib, y un ranking de asociación con el beneficio. Se usó la correlación de <strong>Spearman</strong> en lugar de la de Pearson, ya que el beneficio tiene valores extremos que podrían afectar una relación lineal. Las variables categóricas (subcategoría, categoría, región, segmento y modo de envío) se analizaron con la razón de correlación (η), calculada sobre los rangos del beneficio para compararla con ρ.</p>
+
+								<h4>Visual 2 · Tiempo de entrega por región y categoría (pregunta 2)</h4>
+								<a href="images/caso3-v2-entrega.png" target="_blank" class="image main"><img src="images/caso3-v2-entrega.png" alt="Gráficos de violín de los días de entrega por pedido según región y categoría, con media, intervalo de confianza y resultado de Kruskal-Wallis" /></a>
+								<p>Gráficos de violín con la distribución de los días de entrega, la media, su intervalo de confianza y el resultado de la prueba. Se analizaron <strong>pedidos, no líneas</strong>, ya que el tiempo de entrega corresponde al pedido: con 5,899 líneas la región parecía significativa (p = 0.037), pero con 3,002 pedidos ya no lo era (p = 0.69). No se cumplió la normalidad (Shapiro-Wilk, p &lt; 0.001), por lo que la prueba principal fue <strong>Kruskal-Wallis</strong>, con el ANOVA como confirmación y el tamaño del efecto reportado.</p>
+
+								<h4>Visual 3 · Ventas mensuales y pronóstico (pregunta 3)</h4>
+								<a href="images/caso3-v3-pronostico.png" target="_blank" class="image main"><img src="images/caso3-v3-pronostico.png" alt="Serie de ventas mensuales 2019 a 2020 con tendencia lineal y pronóstico de enero a junio de 2021 con bandas de 80 y 95 por ciento" /></a>
+								<p>Serie de tiempo mensual con tendencia lineal, un pronóstico a seis meses y bandas de incertidumbre del 80 % y 95 %. El método combina la estacionalidad (el peso promedio de cada mes en su año) con el crecimiento interanual. En una prueba de validación, al predecir de julio a diciembre de 2020, tuvo un error medio del 20 %, frente a 26 % de la tendencia sola. Un modelo Holt-Winters de control predijo aproximadamente $314 mil para el primer semestre de 2021, cercano al resultado final.</p>
+
+								<h3>Dashboard</h3>
+								<p>El tablero se diseñó en cuatro páginas que transitan de lo general a lo específico. Cada una presenta un título que resume su hallazgo, une gráficos nativos de Power BI que exploran el patrón con un visual de Python que lo profundiza, y comparte segmentadores sincronizados de año, región, categoría y segmento.</p>
+
+								<h4>Página 1 · Panorama</h4>
+								<a href="images/caso3-pagina1.png" target="_blank" class="image main"><img src="images/caso3-pagina1.png" alt="Página 1 del dashboard: tarjetas de ventas, ganancia, margen, pedidos y clientes; ventas por mes; ganancia por categoría y margen por región" /></a>
+								<p>La empresa vendió $1.34 millones con una ganancia de $175.2 mil, logrando un margen del 13.05 % a través de 3,002 pedidos de 773 clientes. Si bien las ventas crecieron un 20.4 % entre 2019 y 2020, la ganancia solo aumentó un 14.2 % y el margen disminuyó de 13.4 % a 12.7 %. Furniture representó el 31 % de las ventas, pero solo el 6 % de la ganancia. Central tiene el margen más bajo (9.3 %) y West el más alto (15.5 %).</p>
+
+								<h4>Página 2 · Variables asociadas con el beneficio</h4>
+								<a href="images/caso3-pagina2.png" target="_blank" class="image main"><img src="images/caso3-pagina2.png" alt="Página 2 del dashboard: visual de correlación de Python, porcentaje de líneas con pérdida y ganancia por subcategoría" /></a>
+								<p>Las variables que más se relacionan con el beneficio son las ventas (ρ = 0.51) y el precio unitario (ρ = 0.45), aunque están muy correlacionadas entre sí (ρ = 0.93), lo que indica que miden casi lo mismo. Copiers genera la mayor ganancia con $43 mil, mientras que Tables tiene una pérdida de $11.1 mil a pesar de vender $121.7 mil, y el 18.6 % de las líneas de venta reporta pérdidas.</p>
+
+								<h4>Página 3 · Servicio de entrega por región y categoría</h4>
+								<a href="images/caso3-pagina3.png" target="_blank" class="image main"><img src="images/caso3-pagina3.png" alt="Página 3 del dashboard: violines de días de entrega, días de entrega por modo de envío y matriz de región por categoría" /></a>
+								<p>No hubo diferencias importantes en el tiempo de entrega dependiendo de la región o la categoría: es similar en todas partes, entre 3.86 y 3.99 días. Sin embargo, el modo de envío sí lo afecta. Same Day es el más rápido (0.05 días), seguido de First Class (2.1 días), Second Class (3.2 días) y Standard Class, que tarda cerca de 5 días y es el más popular, con un 59 % de los pedidos.</p>
+
+								<h4>Página 4 · Ventas en el tiempo y pronóstico</h4>
+								<a href="images/caso3-pagina4.png" target="_blank" class="image main"><img src="images/caso3-pagina4.png" alt="Página 4 del dashboard: pronóstico de ventas de Python, tarjeta de crecimiento 2020 frente a 2019 y recomendaciones" /></a>
+								<p>Las ventas subieron de $609 mil en 2019 a $733 mil en 2020, un aumento del 20.4 %. El cuarto trimestre fue el más fuerte, con el 38.4 % de las ventas totales y picos de $97 mil en diciembre de 2019 y $118 mil en noviembre de 2020. Para enero a junio de 2021 se espera vender aproximadamente $321 mil, un 25 % más que en el mismo periodo de 2020. Como solo se tienen 24 meses de datos, las predicciones son aproximadas.</p>
 							</section>
 
 						<!-- 6. Documentación -->
@@ -131,10 +200,32 @@
 								<header class="major">
 									<h2>6. Documentación</h2>
 								</header>
-								<p>[Conclusiones, limitaciones y lecciones aprendidas]</p>
+								<h3>Respuestas a las preguntas de investigación</h3>
+								<div class="table-wrapper">
+									<table>
+										<tbody>
+											<tr>
+												<td><strong>Pregunta 1</strong></td>
+												<td>Las variables más asociadas con el beneficio son las ventas y el precio unitario, seguidas por la subcategoría y la cantidad. La logística (días de entrega y modo de envío) y el segmento no se asocian con él.</td>
+											</tr>
+											<tr>
+												<td><strong>Pregunta 2</strong></td>
+												<td>No existen diferencias significativas en el servicio de entrega, usado como indicador de satisfacción, ni por región (p = 0.69) ni por categoría (p = 0.40). Las diferencias provienen del modo de envío.</td>
+											</tr>
+											<tr>
+												<td><strong>Pregunta 3</strong></td>
+												<td>Las ventas crecen cerca de 20 % anual con un pico de fin de año, y para enero a junio de 2021 se espera aproximadamente $321 mil.</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+
 								<h3>Archivos del proyecto</h3>
-								<ul class="actions">
-									<li><a href="https://github.com/danielamora-a/Portafolio" class="button primary icon brands fa-github" target="_blank" rel="noopener noreferrer">Ver archivos en GitHub</a></li>
+								<p>El informe, el archivo de Power BI, los scripts de Python y las medidas DAX están en el repositorio del proyecto.</p>
+								<ul class="actions" style="flex-wrap: wrap;">
+									<li><a href="https://github.com/danielamora-a/Caso3_DM" class="button primary icon brands fa-github" target="_blank" rel="noopener noreferrer">Ver repositorio del Caso 3</a></li>
+									<li><a href="https://github.com/danielamora-a/Caso3_DM/blob/main/Caso3_DanielaMora.pdf" class="button icon solid fa-file-pdf" target="_blank" rel="noopener noreferrer">Informe (PDF)</a></li>
+									<li><a href="https://github.com/danielamora-a/Caso3_DM/tree/main/python" class="button icon brands fa-python" target="_blank" rel="noopener noreferrer">Código Python</a></li>
 								</ul>
 							</section>
 
