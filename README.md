@@ -1,8 +1,8 @@
 # Portafolio de Gestión y Visualización de Datos
 
-Portafolio de Daniela Mora Aguilar para el curso AE-0163 Gestión y Visualización de Datos (Universidad de Costa Rica, II Ciclo 2026).
+Portafolio de Daniela Mora para Gestión y Visualización de Datos.
 
-🌐 **Página web del portafolio:** https://danielamora-a.github.io/Portafolio/
+**Página web del portafolio:** https://danielamora-a.github.io/Portafolio/
 
 ## Organización
 
@@ -23,4 +23,4 @@ Este repositorio contiene el código de la página web. Cada caso está en su pr
 | `images/` | Capturas de los dashboards, diagramas y visuales |
 | `assets/` | Estilos y scripts de la plantilla |
 
-Diseño basado en la plantilla Stellar de [HTML5 UP](https://html5up.net) (licencia CCA 3.0).
+Diseño basado en la plantilla Stellar de [HTML5 UP](https://html5up.net) 
