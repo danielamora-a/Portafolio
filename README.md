@@ -1,6 +1,6 @@
 # Portafolio de Gestión y Visualización de Datos
 
-Portafolio de Daniela Mora para Gestión y Visualización de Datos.
+Portafolio de Daniela Mora para Gestión y Visualización de Datos 
 
 **Página web del portafolio:** https://danielamora-a.github.io/Portafolio/
 
